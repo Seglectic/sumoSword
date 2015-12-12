@@ -6,7 +6,6 @@
 ring = function(){
 
 	this.preload = function(){
-		//game.load.image("gum","gfx/bubblegum.png");
 		playerPreload();
 	};
 
@@ -30,7 +29,6 @@ ring = function(){
 		// game.debug.body(this.enemy)	
 	};
 }
-
 
 var game = new Phaser.Game(window.innerWidth-18,window.innerHeight-17, Phaser.AUTO, 'game');
 game.state.add("ring",ring);
