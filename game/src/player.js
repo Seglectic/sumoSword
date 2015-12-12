@@ -55,7 +55,7 @@ createPlayer =  function(x,y,name,controlling){
 	
 	//Set up player animation properties
 	player.dir = 'down';
-	player.smoothed = true;
+	player.smoothed = false;
 
 
 	/*
@@ -108,9 +108,9 @@ createPlayer =  function(x,y,name,controlling){
 		other moves for the player entity to execute.
 	*/
 	player.controls = function(){
-		if(!controlling){return;}
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
+		if(!controlling){return;}
 		var c = player.cursors
 		if (c.up.isDown){
 			player.body.velocity.y += -player.runSpeed;
