@@ -1,14 +1,28 @@
+
 /*
-	Returns a character entity to be controlled by a player
+	Preloads assets to be used by player entities.
 */
 
+playerPreload = function(){
+		game.load.spritesheet('gum','gfx/gum.png',32,32)
+		game.load.spritesheet('slash','gfx/slash.png',64,64);
+		game.load.image('bg','gfx/sketch.png');
+		game.load.audio('blip','sfx/blip.wav');
+		game.load.audio('burp','sfx/burp.wav');
+}
 
+/*
+						createPlayer
+	Returns a player entity to be controlled by a user
+*/
 
 createPlayer =  function(x,y,name,controlling){
 	var player = game.add.sprite(x,y,name,0);
 	game.physics.enable(player,Phaser.Physics.ARCADE);
 	player.anchor.set(0.5);
 	player.body.collideWorldBounds = true;
+	player.body.setSize(16,20,0,12) //(w,h,ox,oy)	
+
 
 	player.slashTimer = game.time.now; //Timer for attacks
 
@@ -19,45 +33,68 @@ createPlayer =  function(x,y,name,controlling){
 	player.slashes.createMultiple(4,'slash');
 	player.slashes.setAll('anchor.x',0.5);
 	player.slashes.setAll('anchor.y',0.5);
-	player.scale.set(2.5)
-	player.smoothed = false
-	//Defines game controls
+	player.scale.set(2.5);
+
+
+	//Setup sound effects
+	player.slashSound = game.add.audio('blip');
+	player.slashSound.allowMultiple = true;
+	player.hitSound = game.add.audio('burp');
+	//player.hitSound.allowMultiple = true;
+
+	//Defines game controls (needs to be moved to dedicated module later)
 	player.cursors = game.input.keyboard.createCursorKeys();
 	player.atk = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+	player.speed = 450;
+	player.slashSpeed = 350;
+	player.slashDelay = 200;
 
 	//Direction to govern animations
-	player.dir = "down"
+	player.dir = 'down';
+	player.smoothed = true;
 
-
+	/*
+		Player's slash attack.
+	*/
 	player.slash = function(){
 		if(player.slashTimer>game.time.now){return;}
 		var slash = player.slashes.getFirstExists(false);
 		if(!slash){return}
-		player.slashTimer = game.time.now + 350;
-
+		player.slashTimer = game.time.now + player.slashDelay;
 		slash.reset(player.x,player.y);
+		slash.body.mass = 10;
 
-		if(player.dir=="up"){
+		if(player.dir=='up'){
 			slash.frame = 3;
 			slash.body.velocity.x = player.body.velocity.x;
-			slash.body.velocity.y = player.body.velocity.y-230;
+			slash.body.velocity.y = player.body.velocity.y-player.slashSpeed;
 		}
-		if(player.dir=="down"){
+		if(player.dir=='down'){
 			slash.frame = 1;
 			slash.body.velocity.x = player.body.velocity.x
-			slash.body.velocity.y = player.body.velocity.y+230;
+			slash.body.velocity.y = player.body.velocity.y+player.slashSpeed;
 		}
-		if(player.dir=="left"){
+		if(player.dir=='left'){
 			slash.frame = 2;
-			slash.body.velocity.x = player.body.velocity.x-230;
+			slash.body.velocity.x = player.body.velocity.x-player.slashSpeed;
 			slash.body.velocity.y = player.body.velocity.y;
 		}
-		if(player.dir=="right"){
+		if(player.dir=='right'){
 			slash.frame = 0;
-			slash.body.velocity.x = player.body.velocity.x+230;
+			slash.body.velocity.x = player.body.velocity.x+player.slashSpeed;
 			slash.body.velocity.y = player.body.velocity.y;
 		}
-		slash.lifespan = 200;
+		slash.lifespan = 100;
+		player.slashSound.play();
+	}
+
+	/*
+					Player hit callback
+		this is called from collision func which
+		auto- passes in colliding ents in the order specified.
+	*/
+	player.hit = function(player,slash){
+		player.hitSound.play();
 	}
 
 
@@ -68,23 +105,23 @@ createPlayer =  function(x,y,name,controlling){
 		if(!controlling){return;}
 		var c = player.cursors
 		if (c.up.isDown){
-			player.body.velocity.y += -200;
-			player.dir = "up";
+			player.body.velocity.y += -player.speed;
+			player.dir = 'up';
 			player.frame = 2;
 		}
-		if (c.down.isDown){
-			player.body.velocity.y += 200;
-			player.dir = "down";
+		else if (c.down.isDown){
+			player.body.velocity.y += player.speed;
+			player.dir = 'down';
 			player.frame = 0;
 		}
-		if (c.left.isDown){
-			player.body.velocity.x += -200;
-			player.dir = "left";
+		else if (c.left.isDown){
+			player.body.velocity.x += -player.speed;
+			player.dir = 'left';
 			player.frame = 1;
 		}
-		if (c.right.isDown){
-			player.body.velocity.x += 200;
-			player.dir = "right";
+		else if (c.right.isDown){
+			player.body.velocity.x += player.speed;
+			player.dir = 'right';
 			player.frame = 3;
 		}
 		if (player.atk.isDown){player.slash()}
@@ -96,6 +133,5 @@ createPlayer =  function(x,y,name,controlling){
 		player.controls();
 	}
 
-	return player
-
+	return player;
 }

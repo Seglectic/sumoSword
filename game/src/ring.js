@@ -7,10 +7,7 @@ ring = function(){
 
 	this.preload = function(){
 		//game.load.image("gum","gfx/bubblegum.png");
-		game.load.spritesheet('gum','gfx/gum.png',32,32)
-		game.load.spritesheet("slash","gfx/slash.png",64,64);
-		game.load.image("bg","gfx/sketch.png")
-
+		playerPreload();
 	};
 
 
@@ -23,15 +20,14 @@ ring = function(){
 
 
 	this.update = function(){
-		game.physics.arcade.collide(this.player,this.enemy)
-		game.physics.arcade.collide(this.player.slashes,this.enemy)
-
+		game.physics.arcade.collide(this.player,this.enemy);
+		game.physics.arcade.collide(this.enemy,this.player.slashes,this.player.hit);
 	};
 
 
 	this.render = function(){
-
-
+		// game.debug.body(this.player);
+		// game.debug.body(this.enemy)	
 	};
 }
 
