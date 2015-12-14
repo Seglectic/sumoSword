@@ -15,10 +15,16 @@ app.get('/', function (req, res) {
 	console.log("Delivered index.html")
 })
 
+app.get('/socket.io/socket.io.js', function (req, res) {
+	res.sendFile(__dirname + '/nodes_modules/socket.io-client/socket.io.js')
+	console.log("Delivered socket.io.js")
+})
+
 io.on('connection', function (socket) {
+	console.log("Player with "+socket.id+" connected.")
 	
 	//Register the new player to all people in the room.
-	socket.emit('news', { hello: 'world' })
+	io.sockets.connected[socket.id].emit('join','Toast');
 	
 	//Game events
 	socket.on('game', function (data) {

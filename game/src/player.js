@@ -22,7 +22,8 @@ playerPreload = function(){
 						createPlayer
 	Returns a player entity to be controlled by a user
 */
-createPlayer =  function(x,y,name,controlling){
+createPlayer =  function(x,y,name,controller){
+	
 	//Initializes entity and core properties
 	var player = game.add.sprite(x,y,name,0);
 	game.physics.enable(player,Phaser.Physics.ARCADE);
@@ -57,6 +58,8 @@ createPlayer =  function(x,y,name,controlling){
 	player.dir = 'down';
 	player.smoothed = false;
 
+	//SocketId of the player
+	player.socketId = controller;
 
 	/*
 		Player's slash attack.
@@ -110,8 +113,18 @@ createPlayer =  function(x,y,name,controlling){
 	player.controls = function(){
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
-		if(!controlling){return;}
+		//if(!controlling){return;}
+		
+		if(player.socketId != session.id){
+			return;
+		}
+		
 		var c = player.cursors
+		
+		var frameJSON = {
+			
+		}
+		
 		if (c.up.isDown){
 			player.body.velocity.y += -player.runSpeed;
 			player.dir = 'up';
