@@ -51,7 +51,7 @@ createPlayer =  function(x,y,name,controlling){
 	player.cursors = game.input.keyboard.createCursorKeys();
 	player.atk = game.input.keyboard.addKey(Phaser.Keyboard.Z);
 	player.debug = game.input.keyboard.addKey(Phaser.Keyboard.Y); //debug key
-	player.runSpeed = 450;
+	player.runSpeed = 850;
 	player.slashTimer = game.time.now; 
 	player.slashSpeed = 350;
 	player.slashDelay = 200;
@@ -59,6 +59,12 @@ createPlayer =  function(x,y,name,controlling){
 	//Set up player animation properties
 	player.dir = 'down';
 	player.smoothed = false;
+
+	//Show current damage above sprite
+	player.dmg = 0;
+	player.fontStyle = { font: "20px Arial", fill: "#ff0044", wordWrap: true, wordWrapWidth: player.width*2, align: "center" };
+	player.dmgText = game.add.text(player.x,player.y,"DMG: ",player.fontStyle);
+	player.dmgText.anchor.set(0.5);
 
 
 	/*
@@ -103,6 +109,7 @@ createPlayer =  function(x,y,name,controlling){
 	*/
 	player.hit = function(player,slash){
 		player.hitSound.play();
+		player.dmg +=10;
 	}
 
 
@@ -153,6 +160,9 @@ createPlayer =  function(x,y,name,controlling){
 		to be called each frame per player entity
 	*/
 	player.update = function(){
+		player.dmgText.x += (Math.floor(player.x) - (player.dmgText.x))*0.2;
+		player.dmgText.y += (Math.floor(player.y) - (player.dmgText.y+(player.width*0.5)))*0.2;
+		player.dmgText.text = "DMG: "+player.dmg
 		player.controls();
 	}
 

@@ -38,7 +38,8 @@ ring = function(){
 
 	this.render = function(){
 		// game.debug.body(this.player);
-		// game.debug.body(this.enemy)	
+		// game.debug.body(this.enemy);
+		// game.debug.body(this.player.slashes)
 	};
 }
 
