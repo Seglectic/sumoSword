@@ -24,7 +24,7 @@ io.on('connection', function (socket) {
 	console.log("Player with "+socket.id+" connected.")
 	
 	//Register the new player to all people in the room.
-	io.sockets.connected[socket.id].emit('join','Toast');
+	io.sockets.emit('join','Toast');
 	
 	//Game events
 	socket.on('game', function (data) {

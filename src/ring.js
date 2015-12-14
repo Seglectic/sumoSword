@@ -5,6 +5,8 @@
 
 ring = function(){
 
+	this.players = []
+
 	this.preload = function(){
 		playerPreload();
 	};
@@ -14,7 +16,6 @@ ring = function(){
 		//Define the 'gum' player character
 		this.bg = game.add.sprite(0,0,'bg');
 		
-		this.players = []
 		
 		//this.player = createPlayer(game.width/2-(game.width/4),game.height/2,'gum',true);
 		//this.enemy = createPlayer(game.width/1.5,game.height/2,'gum',false);
