@@ -53,7 +53,7 @@ createPlayer =  function(x,y,name,controlling){
 	player.debug = game.input.keyboard.addKey(Phaser.Keyboard.Y); //debug key
 	player.runSpeed = 850;
 	player.slashTimer = game.time.now; 
-	player.slashSpeed = 350;
+	player.slashSpeed = 100;
 	player.slashDelay = 200;
 	
 	//Set up player animation properties
@@ -75,25 +75,28 @@ createPlayer =  function(x,y,name,controlling){
 		var slash = player.slashes.getFirstExists(false);
 		if(!slash){return}
 		player.slashTimer = game.time.now + player.slashDelay;
-		slash.reset(player.x,player.y);
 		slash.body.mass = 10;
 
 		if(player.dir=='up'){
+			slash.reset(player.x,player.y-slash.height);
 			slash.frame = 3;
 			slash.body.velocity.x = player.body.velocity.x;
 			slash.body.velocity.y = player.body.velocity.y-player.slashSpeed;
 		}
 		if(player.dir=='down'){
+			slash.reset(player.x,player.y+slash.height);
 			slash.frame = 1;
 			slash.body.velocity.x = player.body.velocity.x
 			slash.body.velocity.y = player.body.velocity.y+player.slashSpeed;
 		}
 		if(player.dir=='left'){
+			slash.reset(player.x-slash.width,player.y);
 			slash.frame = 2;
 			slash.body.velocity.x = player.body.velocity.x-player.slashSpeed;
 			slash.body.velocity.y = player.body.velocity.y;
 		}
 		if(player.dir=='right'){
+			slash.reset(player.x+slash.width,player.y);
 			slash.frame = 0;
 			slash.body.velocity.x = player.body.velocity.x+player.slashSpeed;
 			slash.body.velocity.y = player.body.velocity.y;
@@ -108,6 +111,7 @@ createPlayer =  function(x,y,name,controlling){
 		auto-passes in colliding ents in the order specified.
 	*/
 	player.hit = function(player,slash){
+		slash.kill();
 		player.hitSound.play();
 		player.dmg +=10;
 	}
@@ -164,6 +168,9 @@ createPlayer =  function(x,y,name,controlling){
 		player.dmgText.y += (Math.floor(player.y) - (player.dmgText.y+(player.width*0.5)))*0.2;
 		player.dmgText.text = "DMG: "+player.dmg
 		player.controls();
+
+		game.physics.arcade.collide(player.slashes,ring.players,player.hit);
+
 	}
 
 	return player;

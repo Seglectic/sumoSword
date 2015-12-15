@@ -18,6 +18,12 @@ ring = function(){
 		// this.player = createPlayer(game.width/2-(game.width/4),game.height/2,'gum',true);
 		this.player = createPlayer(this.bg.width/2-(this.bg.width/4),this.bg.height/2,'gum',true);
 		this.enemy = createPlayer(this.bg.width/1.5,this.bg.height/2,'gum',false);
+
+		//Player group is used to contain all player entities for collision detection, etc
+		this.players = game.add.group()
+		this.players.add(this.player);
+		this.players.add(this.enemy);
+
 		game.world.setBounds(0,0,this.bg.width,this.bg.height);
 
 		game.physics.arcade.gravity.y = 400;
@@ -31,8 +37,8 @@ ring = function(){
 
 
 	this.update = function(){
-		game.physics.arcade.collide(this.player,this.enemy);
-		game.physics.arcade.collide(this.enemy,this.player.slashes,this.player.hit);
+		game.physics.arcade.collide(this.players);
+		//game.physics.arcade.collide(this.enemy,this.player.slashes,this.player.hit);
 	};
 
 
