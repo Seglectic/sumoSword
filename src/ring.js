@@ -4,7 +4,8 @@
 */
 
 ring = function(){
-	
+
+	this.players = []
 
 	this.preload = function(){
 		playerPreload();
@@ -16,8 +17,8 @@ ring = function(){
 		//Define the 'gum' player character
 		this.bg = game.add.sprite(0,0,'bg');
 		// this.player = createPlayer(game.width/2-(game.width/4),game.height/2,'gum',true);
-		this.player = createPlayer(this.bg.width/2-(this.bg.width/4),this.bg.height/2,'gum',true);
-		this.enemy = createPlayer(this.bg.width/1.5,this.bg.height/2,'gum',false);
+		//this.player = createPlayer(this.bg.width/2-(this.bg.width/4),this.bg.height/2,'gum',true);
+		//this.enemy = createPlayer(this.bg.width/1.5,this.bg.height/2,'gum',false);
 		game.world.setBounds(0,0,this.bg.width,this.bg.height);
 
 		game.physics.arcade.gravity.y = 400;
@@ -31,8 +32,17 @@ ring = function(){
 
 
 	this.update = function(){
-		game.physics.arcade.collide(this.player,this.enemy);
-		game.physics.arcade.collide(this.enemy,this.player.slashes,this.player.hit);
+		
+		for(var player of this.players){
+			for(var enemy of this.players){
+				if(player != enemy){
+					game.physics.arcade.collide(player,enemy);
+					game.physics.arcade.collide(player,enemy.slashes,enemy.hit);
+				}
+			}
+		}
+		//game.physics.arcade.collide(this.player,this.enemy);
+		//game.physics.arcade.collide(this.enemy,this.player.slashes,this.player.hit);
 	};
 
 

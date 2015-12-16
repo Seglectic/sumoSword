@@ -60,7 +60,6 @@ createPlayer =  function(x,y,name,controlling){
 	player.dir = 'down';
 	player.smoothed = false;
 
-
 	/*
 		Player's slash attack.
 	*/
@@ -113,8 +112,18 @@ createPlayer =  function(x,y,name,controlling){
 	player.controls = function(){
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
-		if(!player.controlling){return;}
+		//if(!controlling){return;}
+		
+		if(player.controlling != session.id){
+			return;
+		}
+		
 		var c = player.cursors
+		
+		var frameJSON = {
+			
+		}
+		
 		if (c.up.isDown){
 			player.body.velocity.y += -player.runSpeed;
 			player.dir = 'up';
