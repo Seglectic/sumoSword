@@ -5,7 +5,7 @@
 
 ring = function(){
 
-	this.players = []
+	this.players = {}
 
 	this.preload = function(){
 		playerPreload();
@@ -33,11 +33,11 @@ ring = function(){
 
 	this.update = function(){
 		
-		for(var player of this.players){
-			for(var enemy of this.players){
-				if(player != enemy){
-					game.physics.arcade.collide(player,enemy);
-					game.physics.arcade.collide(player,enemy.slashes,enemy.hit);
+		for(var pID in this.players){
+			for(var eID in this.players){
+				if(pID != eID){
+					game.physics.arcade.collide(this.players[pID],this.players[eID]);
+					game.physics.arcade.collide(this.players[pID],this.players[eID].slashes,this.players[eID].hit);
 				}
 			}
 		}

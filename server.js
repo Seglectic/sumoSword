@@ -21,7 +21,6 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 })
 
 
-
 var players = [];
 
 io.on('connection', function (socket) {
@@ -29,7 +28,7 @@ io.on('connection', function (socket) {
 	players.push(socket.id);
 	
 	//Register the new player to all people in the room.
-	io.sockets.emit('join',socket.id);
+	socket.emit('join',socket.id);
 	
 	if(players.length >= 2){
 		io.emit('create',players);
@@ -37,6 +36,7 @@ io.on('connection', function (socket) {
 	
 	//Game events
 	socket.on('game', function (data) {
+		socket.broadcast.emit('game',data);
 		console.log(data)
 	})
 	

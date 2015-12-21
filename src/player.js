@@ -120,10 +120,6 @@ createPlayer =  function(x,y,name,controlling){
 		
 		var c = player.cursors
 		
-		var frameJSON = {
-			
-		}
-		
 		if (c.up.isDown){
 			player.body.velocity.y += -player.runSpeed;
 			player.dir = 'up';
@@ -143,6 +139,16 @@ createPlayer =  function(x,y,name,controlling){
 			player.body.velocity.x += player.runSpeed;
 			player.dir = 'right';
 			player.frame = 1;
+		}
+
+		var frameJSON = {
+			type:"move",
+			player:session.id,
+			frame:player.frame
+		}
+
+		if(c.up.isDown || c.down.isDown || c.left.isDown || c.right.isDown){
+			socket.emit('game', frameJSON )
 		}
 
 		if(player.debug.isDown){
