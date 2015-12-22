@@ -21,14 +21,17 @@ playerPreload = function(){
 						createPlayer
 	Returns a player entity to be controlled by a user
 */
-createPlayer =  function(x,y,name,controlling){
+createPlayer =  function(x,y,name,ID){
 	//Initializes entity and core properties
 	var player = game.add.sprite(x,y,name,0);
 	player.anchor.set(0.5);
 	game.physics.enable(player,Phaser.Physics.ARCADE);
 	player.body.allowGravity = false;
 	player.body.collideWorldBounds = true;
-	player.body.setSize(16,20,0,12) //(w,h,ox,oy)	
+	player.body.setSize(16,20,0,12) //(w,h,ox,oy)
+
+	//If created player ent is user, then make the cam follow em.
+	if(ID == session.id){game.camera.follow(player);}
 
 	//Creates a group of slash sprites to interact with enemy
 	player.slashes = game.add.group();
@@ -47,7 +50,7 @@ createPlayer =  function(x,y,name,controlling){
 	player.hitSound.allowMultiple = false;
 
 	//Defines game controls (needs to be moved to dedicated module later)
-	player.controlling = controlling;
+	player.ID = ID;
 	player.cursors = game.input.keyboard.createCursorKeys();
 	player.atk = game.input.keyboard.addKey(Phaser.Keyboard.Z);
 	player.debug = game.input.keyboard.addKey(Phaser.Keyboard.Y); //debug key
@@ -65,7 +68,6 @@ createPlayer =  function(x,y,name,controlling){
 	player.fontStyle = { font: "20px Arial", fill: "#ff0044", wordWrap: true, wordWrapWidth: player.width*2, align: "center" };
 	player.dmgText = game.add.text(player.x,player.y,"DMG: ",player.fontStyle);
 	player.dmgText.anchor.set(0.5);
-
 
 	/*
 		Player's slash attack.
@@ -124,8 +126,14 @@ createPlayer =  function(x,y,name,controlling){
 	player.controls = function(){
 		player.body.velocity.x = 0;
 		player.body.velocity.y = 0;
-		if(!player.controlling){return;}
+		//if(!controlling){return;}
+		
+		if(player.ID != session.id){
+			return;
+		}
+		
 		var c = player.cursors
+		
 		if (c.up.isDown){
 			player.body.velocity.y += -player.runSpeed;
 			player.dir = 'up';
@@ -145,6 +153,16 @@ createPlayer =  function(x,y,name,controlling){
 			player.body.velocity.x += player.runSpeed;
 			player.dir = 'right';
 			player.frame = 1;
+		}
+
+		var frameJSON = {
+			type:"move",
+			player:session.id,
+			frame:player.frame
+		}
+
+		if(c.up.isDown || c.down.isDown || c.left.isDown || c.right.isDown){
+			socket.emit('game', frameJSON )
 		}
 
 		if(player.debug.isDown){

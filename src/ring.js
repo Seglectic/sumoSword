@@ -4,7 +4,8 @@
 */
 
 ring = function(){
-	
+
+	this.players = {}
 
 	this.preload = function(){
 		playerPreload();
@@ -13,22 +14,20 @@ ring = function(){
 
 
 	this.create = function(){
-		//Define the 'gum' player character
 		this.bg = game.add.sprite(0,0,'bg');
-		// this.player = createPlayer(game.width/2-(game.width/4),game.height/2,'gum',true);
-		this.player = createPlayer(this.bg.width/2-(this.bg.width/4),this.bg.height/2,'gum',true);
-		this.enemy = createPlayer(this.bg.width/1.5,this.bg.height/2,'gum',false);
+		game.world.setBounds(0,0,this.bg.width,this.bg.height);
+		game.physics.arcade.gravity.y = 400;
+
 
 		//Player group is used to contain all player entities for collision detection, etc
 		this.players = game.add.group()
+
+		/* Defines static player characters: 
+		this.player = createPlayer(this.bg.width/2-(this.bg.width/4),this.bg.height/2,'gum',true);
+		this.enemy = createPlayer(this.bg.width/1.5,this.bg.height/2,'gum',false);
 		this.players.add(this.player);
 		this.players.add(this.enemy);
-
-		game.world.setBounds(0,0,this.bg.width,this.bg.height);
-
-		game.physics.arcade.gravity.y = 400;
-
-		game.camera.follow(this.player)
+		*/
 
 		//Fullscreen options
 		// game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
@@ -37,8 +36,16 @@ ring = function(){
 
 
 	this.update = function(){
-		game.physics.arcade.collide(this.players);
-		//game.physics.arcade.collide(this.enemy,this.player.slashes,this.player.hit);
+		for(var pID in this.players){
+			for(var eID in this.players){
+				if(pID != eID){
+					game.physics.arcade.collide(this.players[pID],this.players[eID]);
+					//game.physics.arcade.collide(this.players[pID],this.players[eID].slashes,this.players[eID].hit);
+				}
+			}
+		}
+
+		// game.physics.arcade.collide(this.players); //Should work to collide all players together
 	};
 
 
