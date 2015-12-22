@@ -15,7 +15,7 @@ window.setTimeout(function(){
 			
 			for(var player of players){
 				console.log("Create "+player);
-				game.state.states["ring"].players[player] = createPlayer(game.width/2-(game.width/4),game.height/2,'gum',player)
+				game.state.states["ring"].players.add( createPlayer(game.world.width/2-(game.world.width/4),game.world.height/2,'gum',player) )
 			}
 		})
 

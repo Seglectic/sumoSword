@@ -21,14 +21,17 @@ playerPreload = function(){
 						createPlayer
 	Returns a player entity to be controlled by a user
 */
-createPlayer =  function(x,y,name,controlling){
+createPlayer =  function(x,y,name,ID){
 	//Initializes entity and core properties
 	var player = game.add.sprite(x,y,name,0);
 	player.anchor.set(0.5);
 	game.physics.enable(player,Phaser.Physics.ARCADE);
 	player.body.allowGravity = false;
 	player.body.collideWorldBounds = true;
-	player.body.setSize(16,20,0,12) //(w,h,ox,oy)	
+	player.body.setSize(16,20,0,12) //(w,h,ox,oy)
+
+	//If created player ent is user, then make the cam follow em.
+	if(ID == session.id){game.camera.follow(player);}
 
 	//Creates a group of slash sprites to interact with enemy
 	player.slashes = game.add.group();
@@ -47,18 +50,24 @@ createPlayer =  function(x,y,name,controlling){
 	player.hitSound.allowMultiple = false;
 
 	//Defines game controls (needs to be moved to dedicated module later)
-	player.controlling = controlling;
+	player.ID = ID;
 	player.cursors = game.input.keyboard.createCursorKeys();
 	player.atk = game.input.keyboard.addKey(Phaser.Keyboard.Z);
 	player.debug = game.input.keyboard.addKey(Phaser.Keyboard.Y); //debug key
-	player.runSpeed = 450;
+	player.runSpeed = 850;
 	player.slashTimer = game.time.now; 
-	player.slashSpeed = 350;
+	player.slashSpeed = 100;
 	player.slashDelay = 200;
 	
 	//Set up player animation properties
 	player.dir = 'down';
 	player.smoothed = false;
+
+	//Show current damage above sprite
+	player.dmg = 0;
+	player.fontStyle = { font: "20px Arial", fill: "#ff0044", wordWrap: true, wordWrapWidth: player.width*2, align: "center" };
+	player.dmgText = game.add.text(player.x,player.y,"DMG: ",player.fontStyle);
+	player.dmgText.anchor.set(0.5);
 
 	/*
 		Player's slash attack.
@@ -68,25 +77,28 @@ createPlayer =  function(x,y,name,controlling){
 		var slash = player.slashes.getFirstExists(false);
 		if(!slash){return}
 		player.slashTimer = game.time.now + player.slashDelay;
-		slash.reset(player.x,player.y);
 		slash.body.mass = 10;
 
 		if(player.dir=='up'){
+			slash.reset(player.x,player.y-slash.height);
 			slash.frame = 3;
 			slash.body.velocity.x = player.body.velocity.x;
 			slash.body.velocity.y = player.body.velocity.y-player.slashSpeed;
 		}
 		if(player.dir=='down'){
+			slash.reset(player.x,player.y+slash.height);
 			slash.frame = 1;
 			slash.body.velocity.x = player.body.velocity.x
 			slash.body.velocity.y = player.body.velocity.y+player.slashSpeed;
 		}
 		if(player.dir=='left'){
+			slash.reset(player.x-slash.width,player.y);
 			slash.frame = 2;
 			slash.body.velocity.x = player.body.velocity.x-player.slashSpeed;
 			slash.body.velocity.y = player.body.velocity.y;
 		}
 		if(player.dir=='right'){
+			slash.reset(player.x+slash.width,player.y);
 			slash.frame = 0;
 			slash.body.velocity.x = player.body.velocity.x+player.slashSpeed;
 			slash.body.velocity.y = player.body.velocity.y;
@@ -101,7 +113,9 @@ createPlayer =  function(x,y,name,controlling){
 		auto-passes in colliding ents in the order specified.
 	*/
 	player.hit = function(player,slash){
+		slash.kill();
 		player.hitSound.play();
+		player.dmg +=10;
 	}
 
 
@@ -114,7 +128,7 @@ createPlayer =  function(x,y,name,controlling){
 		player.body.velocity.y = 0;
 		//if(!controlling){return;}
 		
-		if(player.controlling != session.id){
+		if(player.ID != session.id){
 			return;
 		}
 		
@@ -168,7 +182,13 @@ createPlayer =  function(x,y,name,controlling){
 		to be called each frame per player entity
 	*/
 	player.update = function(){
+		player.dmgText.x += (Math.floor(player.x) - (player.dmgText.x))*0.2;
+		player.dmgText.y += (Math.floor(player.y) - (player.dmgText.y+(player.width*0.5)))*0.2;
+		player.dmgText.text = "DMG: "+player.dmg
 		player.controls();
+
+		game.physics.arcade.collide(player.slashes,ring.players,player.hit);
+
 	}
 
 	return player;
